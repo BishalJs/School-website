@@ -1,6 +1,6 @@
 const mongoose= require('mongoose');
-const URL="mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.9.2";
- 
+const URL="mongodb+srv://shotgaming124_db_user:<shotgaming124_db_use>@cluster0.z4c2bff.mongodb.net/"
+require('dotenv').config();
 mongoose.connect(URL)
 const db= mongoose.connection;
 db.on('connected',()=>{
