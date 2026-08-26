@@ -6,13 +6,15 @@
   "author": "Bishal Bhusal",
   "type": "commonjs",
   "main": "sever.js",
- "scripts": {
-  "dev": "nodemon sever.js"
-},
+  "scripts": {
+    "dev": "nodemon sever.js"
+  },
   "dependencies": {
     "cors": "^2.8.6",
+    "dns": "^0.2.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongodb": "^7.5.0",
     "mongoose": "^9.9.3"
   },
   "devDependencies": {
