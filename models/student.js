@@ -14,10 +14,12 @@ const studentschema= new mongoose.Schema({
         required:true,
     },
     "id":{
+        type:String,
         unique:true,
         required:true,
     },
     "email":{
+        type:String,
         unique:true,
         required:true,
     }
