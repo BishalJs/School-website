@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const app= express();
 const student = require('../models/student');
-app.use(express.json());
+const app = express();
+
 
 router.get('/student',async(req,res)=>{
     try{
-   const student= await student.find();
-  res.status(200).json(response);
-  console.log(response);
+   const Student= await student.find();
+  res.status(200).json(Student);
+  console.log(Student);
 
 }
 
@@ -22,12 +22,14 @@ router.get('/student',async(req,res)=>{
 });
 router.post('/student',async(req,res)=>{
     try{
+    console.log(req.body)
     const data= req.body;
     const Student= new student(data);
     const save= await Student.save();
     res.status(200).json({message:'Student is saved sucessfully'}
         )
     console.log(save)
+    
    
 }
     catch(err){
