@@ -37,21 +37,34 @@ router.post('/student',async(req,res)=>{
         console.log(err)
     }
 })
-router.put('/student',async(req,res)=>{
+router.put('/:student',async(req,res)=>{
+
     try{
+        const Student= req.params.student;
+        const update= req.body;
+        const response= await student.findByIdAndUpdate(Student,update,{new:true,});
+        console.log(response)
 
     }
     catch(err){
-
+       res.status(500).json({message:'failed to update student due to',err})
+        console.log(err)
 
     }
 
 });
-router.delete('/student',async(req,res)=>{
+router.delete('/:student',async(req,res)=>{
     try{
+        const Student= req.params.student;
+        const user= req.body;
+        const dlt= student.findByIdAndDelete(Student,user,{new:true,});
+        console.log('Student has been deleted sucessfully')
 
     }
     catch(err){
+         res.status(500).json({message:'failed to delete student due to',err})
+        console.log(err)
+
         
     }
 })
