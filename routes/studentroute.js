@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const student = require('../models/student');
+const app= express(); 
 
 
 
@@ -40,8 +41,8 @@ router.post('/student',async(req,res)=>{
 router.put('/:student',async(req,res)=>{
 
     try{
-        const Student= req.params.student;
-        const update= req.body;
+        const Student= req.params.student;// stores object id
+        const update= req.body; // data from user from 
         const response= await student.findByIdAndUpdate(Student,update,{new:true,});
         console.log(response)
 

@@ -1,13 +1,20 @@
-const router = require.Router();
+
 const express = require('express');
+const router= express.Router();
+const teacher = require('../models/teacher');
 const app= express();
-app.use(express.json());
+
 
 router.get('/teacher',async(req,res)=>{
     try{
-   const data= req.body;}
+   const Teacher= await teacher.find();
+   console.log(Teacher);
+   res.status(200).json(Teacher);
+}
 
    catch(err){
+    res.status(500).json({message:"Cant find any teacher"});
+    console.log(err);
 
    }
 
@@ -15,8 +22,14 @@ router.get('/teacher',async(req,res)=>{
 });
 router.post('/teacher',async(req,res)=>{
     try{
-    const data= req.body}
+    const data= req.body;
+    const Teacher= new teacher(data);
+    const response = await Teacher.save();
+    res.status(200).json(response);
+}
     catch(err){
+    res.status(500).json({message:"Failed to add teacher"});
+    console.log(err)
 
     }
 })
