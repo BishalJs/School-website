@@ -33,7 +33,7 @@ router.post('/teacher',async(req,res)=>{
 
     }
 })
-router.put('/:teacher',async(req,res)=>{
+router.put('/teacher/:teacherId',async(req,res)=>{
     try{
         const teacherId= req.params.teacher;
         const data= req.body;
@@ -50,7 +50,7 @@ router.put('/:teacher',async(req,res)=>{
     }
 
 });
-router.delete('/:teacher',async(req,res)=>{
+router.delete('/teacher/:teacherId',async(req,res)=>{
     try{
         const teacherId= req.params.teacher;
         const response = await teacher.findByIdAndDelete(teacherId);
@@ -63,4 +63,5 @@ router.delete('/:teacher',async(req,res)=>{
         console.log(err);
     }
 })
+
 module.exports = router; 
