@@ -1,6 +1,4 @@
 const mongoose= require('mongoose');
-const { type } = require('node:os');
-const { title } = require('node:process');
 const noticeschema= new mongoose.Schema({
     title:{
         type:String,
