@@ -6,29 +6,21 @@ const teacherroute= require('./routes/teacherroute');
 const studentmodel= require('./models/student');
 const eventroute= require('./routes/eventroue');
 const noticeroute= require('./routes/noticeroute');
-const passport= require('passport');
-const LocalStrategy= require('passport-local').Strategy;
+const passport= require('./auth');
+app.use(passport.initialize());
 require('dotenv').config();
 app.use(express.json());
 app.use('/', studentrouter);
 app.use('/', teacherroute);
 app.use('/', eventroute);
 app.use('/', noticeroute);
-app.use(new LocalStrategy(async(username,password,done)=>{
-    try{
-        console.log('usercredientials:', {username,password});
-        const user= await studentmodel.findOne({username:username});
-        if(!user){
-            return done(null,false,{message:'Incorrect username'});
-        }
-}
-    catch(err){;
-const mongoose= require('mongoose')
 const Logreq= (req,res,next)=>{
     console.log(`[${new Date().toLocaleString()}]`);
-    next();}}
-}));
+    next();}
+;
 app.use(Logreq);
+const authenticate= passport.authenticate('local',{session:false});
+
 
 app.get('/',(req,res)=>{
     res.send('You are in the page')
