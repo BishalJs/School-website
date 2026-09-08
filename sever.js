@@ -6,20 +6,16 @@ const teacherroute= require('./routes/teacherroute');
 const studentmodel= require('./models/student');
 const eventroute= require('./routes/eventroue');
 const noticeroute= require('./routes/noticeroute');
+const bcrypt = require("bcrypt");
 const passport= require('./auth');
-app.use(passport.initialize());
 require('dotenv').config();
 app.use(express.json());
 app.use('/', studentrouter);
 app.use('/', teacherroute);
 app.use('/', eventroute);
 app.use('/', noticeroute);
-const Logreq= (req,res,next)=>{
-    console.log(`[${new Date().toLocaleString()}]`);
-    next();}
-;
-app.use(Logreq);
-const authenticate= passport.authenticate('local',{session:false});
+
+
 
 
 app.get('/',(req,res)=>{
