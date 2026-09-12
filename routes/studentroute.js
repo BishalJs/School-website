@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
 const app= express(); 
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 
 
 
 router.get('/student',async(req,res)=>{
     try{
    const Student= await student.find();
+
   res.status(200).json(Student);
   console.log(Student);
 
@@ -67,6 +71,47 @@ router.delete('/:student',async(req,res)=>{
         console.log(err)
 
         
+    }
+})
+router.post('/register',async(req,res)=>{
+    try{
+        const {username,email,password}= req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);// store hashed password in database
+        console.log({username,
+                      email,
+                      hashedPassword});
+        res.send('You are in the register page')
+    }
+    catch(err){
+        res.status(500).json({message:'failed to register student due to',err})
+        console.log(err)
+    }
+})
+router.post('/login',async(req,res)=>{
+
+}
+)
+router.get('/register/admin',async(req,res)=>{
+    try{
+        const userdetails= await student.find()
+        res.send('You are admin page')}
+    catch(err){
+        res.status(500).json({message:'failed to access admin register page due to',err})
+        console.log(err)
+    }})
+router.get('/token',async(req,res)=>{
+    try{
+        const token= jwt.sign({username:'Bishal@123'},//information to be stored in token
+              'secretkey',// secret key use to verify the token
+              {expiresIn:'1h'}// expiration time of token    
+        );
+        res.json({token})
+    }
+
+    
+    catch(err){
+        res.status(500).json({message:'failed to generate token due to',err})
+        console.log(err)
     }
 })
 module.exports = router; 

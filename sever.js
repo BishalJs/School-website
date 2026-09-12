@@ -14,10 +14,6 @@ app.use('/', studentrouter);
 app.use('/', teacherroute);
 app.use('/', eventroute);
 app.use('/', noticeroute);
-
-
-
-
 app.get('/',(req,res)=>{
     res.send('You are in the page')
 }); 
