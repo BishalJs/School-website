@@ -2,9 +2,18 @@ const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
 const app= express(); 
+const auth = require('../auth');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+router.use(auth.initialize());
+
+// middleware to log requests 
+const logreq = (req, res, next) => {
+    console.log(`${new Date().toLocaleString()} ${req.method} ${req.originalUrl}`);
+    next();
+};
+router.use(logreq);
 
 
 
@@ -113,5 +122,19 @@ router.get('/token',async(req,res)=>{
         res.status(500).json({message:'failed to generate token due to',err})
         console.log(err)
     }
-})
+});
+router.get('/profile',async(req,res,next)=>{try{
+    const user= req.body;
+    const authHeader= req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
+    jwt.verify(token, secret, (err, user) => {
+    // ...
+});
+
+}
+catch(err){
+    res.status(500).json({message:'failed to access profile page due to',err})
+    console.log(err)
+};})
+
 module.exports = router; 
