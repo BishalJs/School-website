@@ -2,11 +2,32 @@ const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
 const app= express(); 
-const auth = require('../auth');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const passport = require('passport');
+const { applyTimestamps } = require('../models/Event');
+const localStrategy = require('passport-local').Strategy;
 
-router.use(auth.initialize());
+passport.use(new localStrategy((username, password, done) => { //authentication login system using passport-local strategy
+    try{
+        console.log('Usercredentials:', username, password); // logs username and password to the console for debugging purposes
+        const user = student.findOne({ username: username }); // checks the username of the student in the database
+        if(!user){
+            done(null, false, { message: 'Username not found' }); // if user is not found, return an error message
+        };
+        const passwordMatch= user.password === password; // checks if the password matches the one in the database
+        if(!passwordMatch){
+            done(null, false, { message: 'Invalid password' }); // if password is incorrect, return an error message
+        }
+        else{
+            done(null, user); // if username and password are correct, return the user object
+        }
+    }
+    catch(err){
+        done(err); // if there is an error, return the error
+    }
+}));
+app.use(passport.initialize()); // initializes passport middleware
 
 // middleware to log requests 
 const logreq = (req, res, next) => {
@@ -17,7 +38,7 @@ router.use(logreq);
 
 
 
-router.get('/student',async(req,res)=>{
+router.get('/student',passport.authenticate('local' ),async(req,res)=>{
     try{
    const Student= await student.find();
 
@@ -136,5 +157,4 @@ catch(err){
     res.status(500).json({message:'failed to access profile page due to',err})
     console.log(err)
 };})
-
-module.exports = router; 
+exports = router; 
