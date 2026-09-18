@@ -1,15 +1,31 @@
 const express= require('express');
 const db= require('./db')
+const router = express.Router();
 const app= express();
+const expresssession= require('express-session');
 const studentrouter= require('./routes/studentroute');
 const teacherroute= require('./routes/teacherroute');
 const studentmodel= require('./models/student');
 const eventroute= require('./routes/eventroue');
 const noticeroute= require('./routes/noticeroute');
 const bcrypt = require("bcrypt");
-const passport= require('./auth');
-require('dotenv').config();
+const passport= require('passport');
 app.use(express.json());
+
+
+app.use(
+  expresssession({
+    secret: "your-secret-key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+router.use(passport.initialize());
+router.use(passport.session());// initializes passport middleware
+
+
+require('dotenv').config();
 app.use('/', studentrouter);
 app.use('/', teacherroute);
 app.use('/', eventroute);
