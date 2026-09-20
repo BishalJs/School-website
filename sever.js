@@ -8,18 +8,12 @@ const teacherroute= require('./routes/teacherroute');
 const studentmodel= require('./models/student');
 const eventroute= require('./routes/eventroue');
 const noticeroute= require('./routes/noticeroute');
+const auth= require('./auth');
 const bcrypt = require("bcrypt");
 const passport= require('passport');
 app.use(express.json());
 
 
-app.use(
-  expresssession({
-    secret: "your-secret-key",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
 
 router.use(passport.initialize());
 router.use(passport.session());// initializes passport middleware

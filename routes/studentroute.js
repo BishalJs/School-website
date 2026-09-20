@@ -6,29 +6,9 @@ const expressSession = require('express-session');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passport = require('passport');
-const { applyTimestamps } = require('../models/Event');
 const localStrategy = require('passport-local').Strategy;
 
 
-passport.use(new localStrategy(async(username, password, done) => { //authentication login system using passport-local strategy
-    try{
-        console.log('Usercredentials:', username, password); // logs username and password to the console for debugging purposes
-        const user = await student.findOne({ username: username }); // checks the username of the student in the database
-        if(!user){
-           return done(null, false, { message: 'Username not found' }); // if user is not found, return an error message
-        };
-       
-        if(password !== user.password){ // checks user password with the password stored in the database
-            return done(null, false, { message: 'Invalid password' }); // if password is incorrect, return an error message
-        }
-        else{
-            return done(null, user); // if username and password are correct, return the user object
-        }
-    }
-    catch(err){
-        return done(err); // if there is an error, return the error
-    }
-}));
 
 
 // middleware to log requests 
@@ -107,56 +87,41 @@ router.delete('/:student',async(req,res)=>{
 })
 router.post('/register',async(req,res)=>{
     try{
-        const {username,email,password}= req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);// store hashed password in database
-        console.log({username,
-                      email,
-                      hashedPassword});
-        res.send('You are in the register page')
-    }
-    catch(err){
-        res.status(500).json({message:'failed to register student due to',err})
-        console.log(err)
-    }
-})
-router.post('/login',async(req,res)=>{
+        const{username,email,password}= req.body;// takes username,email and password from the user
+        const hashedPassword= await bcrypt.hash(password,10);// hashes the password using bcrypt with a salt rounds of 10
+        const newStudent= new student({
+            username:username,
+            email:email,
+            password:hashedPassword
 
-}
-)
-router.get('/register/admin',async(req,res)=>{
-    try{
-        const userdetails= await student.find()
-        res.send('You are admin page')}
-    catch(err){
-        res.status(500).json({message:'failed to access admin register page due to',err})
-        console.log(err)
-    }})
-router.get('/token',async(req,res)=>{
-    try{
-        const token= jwt.sign({username:'Bishal@123'},//information to be stored in token
-              'secretkey',// secret key use to verify the token
-              {expiresIn:'1h'}// expiration time of token    
-        );
-        res.json({token})
-    }
+        })// stores the new student data in a new instance of the student model with hashed password
+        const savedStudent= await newStudent.save();// saves the new student to the database
+        res.status(201).json({message:'Student registered successfully',student:savedStudent});// sends a success response with the saved student data
+        console.log(savedStudent);
 
-    
-    catch(err){
-        res.status(500).json({message:'failed to generate token due to',err})
-        console.log(err)
     }
-});
-router.get('/profile',async(req,res,next)=>{try{
-    const user= req.body;
-    const authHeader= req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
-    jwt.verify(token, secret, (err, user) => {
-    // ...
-});
-
-}
 catch(err){
-    res.status(500).json({message:'failed to access profile page due to',err})
+    res.status(500).json({message:'Failed to register student due to',err})
+ console.log(err)
+}})
+router.post('/login',async(req,res)=>{
+    try{
+        const {username,email,password}= req.body;// takes username and password from the user
+        const Student= await student.findOne({username});// finds the student by username and email in the database
+        if(!Student){
+            return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
+        }
+        const passwordMatch = await bcrypt.compare(password,Student.password);// compares the provided password with the hashed password in the database
+        if(!passwordMatch){
+            return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
+        }
+        res.status(200).json({message:'Student logged in successfully',Student:Student,passwordMatch:passwordMatch});// sends a success response with the student data and password match result
+        console.log(Student);
+    }
+catch(err){
+    res.status(500).json({message:'Failed to login student due to',err})
     console.log(err)
-};})
+}});
+
+
 module.exports = router; 
