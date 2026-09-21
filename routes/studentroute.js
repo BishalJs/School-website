@@ -106,22 +106,38 @@ catch(err){
 }})
 router.post('/login',async(req,res)=>{
     try{
-        const {username,email,password}= req.body;// takes username and password from the user
-        const Student= await student.findOne({username});// finds the student by username and email in the database
+        const {username,password}= req.body;// takes username and password from the user
+        const Student= await student.findOne({username});// finds the student by username in the database
         if(!Student){
             return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
         }
         const passwordMatch = await bcrypt.compare(password,Student.password);// compares the provided password with the hashed password in the database
         if(!passwordMatch){
             return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
-        }
-        res.status(200).json({message:'Student logged in successfully',Student:Student,passwordMatch:passwordMatch});// sends a success response with the student data and password match result
+        };
+        // stores the student data in the session
+        res.status(200).json({message:'Student logged in successfully'});// sends a success response with the student data and password match result
         console.log(Student);
     }
 catch(err){
     res.status(500).json({message:'Failed to login student due to',err})
     console.log(err)
 }});
+router.get('/profile',async(req,res)=>{
+    try{
+   if(!req.session.student){
+    return res.status(401).json({message:'You must be logged in to view your profile'});// sends a 401 response if the student is not logged in
+    };
+    const Student= await student.findById(req.session.student._id);// finds the student by id in the database
+   if(!Student){
+    return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
+   }
+res.status(200).json({message:'Student profile fetched successfully',student:Student});// sends a success response with the student data
+}
+    catch(err){
+        res.status(500).json({message:'Failed to fetch student profile due to',err})
+        console.log(err)
+    }
 
-
+})
 module.exports = router; 

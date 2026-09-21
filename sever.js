@@ -12,11 +12,17 @@ const auth= require('./auth');
 const bcrypt = require("bcrypt");
 const passport= require('passport');
 app.use(express.json());
+app.use(
+    expresssession({
+        secret: 'my-secret-key',
+        resave: false,
+        saveUninitialized: false
+    })
+);
 
 
 
-router.use(passport.initialize());
-router.use(passport.session());// initializes passport middleware
+
 
 
 require('dotenv').config();
