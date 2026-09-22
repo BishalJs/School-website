@@ -115,7 +115,7 @@ router.post('/login',async(req,res)=>{
         if(!passwordMatch){
             return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
         };
-        // stores the student data in the session
+       req.session.userId = Student._id; // stores student id in the session to keep the student logged in
         res.status(200).json({message:'Student logged in successfully'});// sends a success response with the student data and password match result
         console.log(Student);
     }
@@ -125,10 +125,11 @@ catch(err){
 }});
 router.get('/profile',async(req,res)=>{
     try{
-   if(!req.session.student){
+   if(!req.session.userId){
     return res.status(401).json({message:'You must be logged in to view your profile'});// sends a 401 response if the student is not logged in
     };
-    const Student= await student.findById(req.session.student._id);// finds the student by id in the database
+
+    const Student= await student.findById(req.session.userId);// finds the student by id in the database
    if(!Student){
     return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
    }

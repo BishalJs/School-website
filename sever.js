@@ -2,7 +2,7 @@ const express= require('express');
 const db= require('./db')
 const router = express.Router();
 const app= express();
-const expresssession= require('express-session');
+const session= require('express-session');
 const studentrouter= require('./routes/studentroute');
 const teacherroute= require('./routes/teacherroute');
 const studentmodel= require('./models/student');
@@ -13,7 +13,7 @@ const bcrypt = require("bcrypt");
 const passport= require('passport');
 app.use(express.json());
 app.use(
-    expresssession({
+    session({
         secret: 'my-secret-key',
         resave: false,
         saveUninitialized: false
