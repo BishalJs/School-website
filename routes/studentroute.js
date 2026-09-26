@@ -1,12 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
-const app= express(); 
-const expressSession = require('express-session');
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const passport = require('passport');
-const localStrategy = require('passport-local').Strategy;
+
 
 
 
@@ -20,7 +16,7 @@ router.use(logreq);
 
 
 
-router.get('/student',passport.authenticate('local', { session: false }),async(req,res)=>{
+router.get('/student',async(req,res)=>{
     try{
    const Student= await student.find();
 
@@ -115,7 +111,7 @@ router.post('/login',async(req,res)=>{
         if(!passwordMatch){
             return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
         };
-       req.session.userId = Student._id; // stores student id in the session to keep the student logged in
+        req.session.userId = Student._id; // stores student id in the session to keep the student logged in
         res.status(200).json({message:'Student logged in successfully'});// sends a success response with the student data and password match result
         console.log(Student);
     }
@@ -125,20 +121,19 @@ catch(err){
 }});
 router.get('/profile',async(req,res)=>{
     try{
-   if(!req.session.userId){
-    return res.status(401).json({message:'You must be logged in to view your profile'});// sends a 401 response if the student is not logged in
-    };
+        if(!req.session.userId){
+            return res.status(401).json({message:"You must be login"})
+        } // if user is nor login in
+        const  Student= await student.findById(req.session.userId);// to find studentt by _id
+       if(!Student){
+        return res.status(401).json({message:"Cant find Your profile"});
+        res.status(200).json({message:"Your profile is found",Student});
 
-    const Student= await student.findById(req.session.userId);// finds the student by id in the database
-   if(!Student){
-    return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
-   }
-res.status(200).json({message:'Student profile fetched successfully',student:Student});// sends a success response with the student data
-}
+
+    }}
     catch(err){
-        res.status(500).json({message:'Failed to fetch student profile due to',err})
-        console.log(err)
-    }
 
+    }
 })
+
 module.exports = router; 

@@ -5,18 +5,14 @@ const studentschema= new mongoose.Schema({
        
     },
     "class":{
-        type:Number,
+        type:Number
       
     },
     "age":{
         type:Number,
      
     },
-    "id":{
-        type:String,
-        unique:true,
-       
-    },
+ 
     "email":{
         type:String,
         unique:true,
