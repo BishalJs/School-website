@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 
 
 
@@ -110,30 +110,45 @@ router.post('/login',async(req,res)=>{
         const passwordMatch = await bcrypt.compare(password,Student.password);// compares the provided password with the hashed password in the database
         if(!passwordMatch){
             return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
-        };
-        req.session.userId = Student._id; // stores student id in the session to keep the student logged in
-        res.status(200).json({message:'Student logged in successfully'});// sends a success response with the student data and password match result
-        console.log(Student);
-    }
-catch(err){
-    res.status(500).json({message:'Failed to login student due to',err})
-    console.log(err)
-}});
+        }
+        req.session.userId=Student._id // stores _id in userid for quick identification
+     res.status(200).json({message:'Login successful',student:Student})
+   }
+    catch(err){
+        res.status(500).json({message:'Failed to login due to',err})
+        console.log(err)
+    }});
+     
 router.get('/profile',async(req,res)=>{
     try{
         if(!req.session.userId){
             return res.status(401).json({message:"You must be login"})
-        } // if user is nor login in
-        const  Student= await student.findById(req.session.userId);// to find studentt by _id
-       if(!Student){
-        return res.status(401).json({message:"Cant find Your profile"});
-        res.status(200).json({message:"Your profile is found",Student});
-
-
-    }}
-    catch(err){
-
+        }
+        const Student = await student.findById(req.session.userId);
+        if(!Student){
+            return res.status(401).json({message:"Cant find Your profile"})
+        }
+        res.status(200).json({message:"Your profile is found",Student})
+    } catch(err){
+        res.status(500).json({message:'Failed to get profile due to',err})
+        console.log(err)
     }
 })
+router.post('/logout',(req,res)=>{
+    req.session.destroy((err)=>{
+        if(err){
+            console.log(err)
+            return res.status(500).json({message:'Failed to logout due to',err})
+        }
+    })
+res.status(200).json({message:'Logout successful'})
+ 
+})
+    
+        
+
+
+    
+
 
 module.exports = router; 
