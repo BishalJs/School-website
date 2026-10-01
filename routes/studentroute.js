@@ -3,20 +3,23 @@ const router = express.Router();
 const student= require('../models/student');
 const bcrypt = require('bcrypt');
 
-
-
-
-
 // middleware to log requests 
 const logreq = (req, res, next) => {
     console.log(`${new Date().toLocaleString()} ${req.method} ${req.originalUrl}`);
     next();
 };
 router.use(logreq);
+// middleware to protect the routes by allowing only the user who are logged in
+const islogedIn= (req,res,next)=>{
+    if(!req.session.userId){
+        return res.status(401).json({message:"You must be login"})
+    };
+    next()
+}
 
 
 
-router.get('/student',async(req,res)=>{
+router.get('/student',islogedIn,async(req,res)=>{
     try{
    const Student= await student.find();
 
@@ -50,7 +53,7 @@ router.post('/student',async(req,res)=>{
         console.log(err)
     }
 })
-router.put('/:student',async(req,res)=>{
+router.put('/:student',islogedIn,async(req,res)=>{
 
     try{
         const Student= req.params.student;// stores object id
@@ -66,7 +69,7 @@ router.put('/:student',async(req,res)=>{
     }
 
 });
-router.delete('/:student',async(req,res)=>{
+router.delete('/:student',islogedIn,async(req,res)=>{
     try{
         const Student= req.params.student;
         const user= req.body;
@@ -112,23 +115,26 @@ router.post('/login',async(req,res)=>{
             return res.status(401).json({message:'Invalid password'});// sends a 401 response if the password does not match
         }
         req.session.userId=Student._id // stores _id in userid for quick identification
-     res.status(200).json({message:'Login successful',student:Student})
+     res.status(200).json({message:'Login successful',Student:{
+        "username":Student.username,
+        "email":Student.email,
+     }})
    }
     catch(err){
         res.status(500).json({message:'Failed to login due to',err})
         console.log(err)
     }});
      
-router.get('/profile',async(req,res)=>{
+router.get('/profile',islogedIn,async(req,res)=>{
     try{
-        if(!req.session.userId){
-            return res.status(401).json({message:"You must be login"})
-        }
-        const Student = await student.findById(req.session.userId);
+        const Student= await student.findById(req.session.userId);// finds the student by _id stored in session
         if(!Student){
-            return res.status(401).json({message:"Cant find Your profile"})
-        }
-        res.status(200).json({message:"Your profile is found",Student})
+            return res.status(404).json({message:'Student not found'});// sends a 404 response if the student is not found
+        };
+        res.status(200).json({message:"Your profile is found",Student:{
+            "username":Student.username,
+            "email":Student.email,
+        }});
     } catch(err){
         res.status(500).json({message:'Failed to get profile due to',err})
         console.log(err)
