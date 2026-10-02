@@ -12,6 +12,13 @@ const studentschema= new mongoose.Schema({
         type:Number,
      
     },
+    "role":{
+        require:true,
+        type:String,
+        enum:['student','admin'],
+        default:'student'
+
+    },
  
     "email":{
         type:String,

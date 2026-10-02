@@ -15,6 +15,25 @@ const islogedIn= (req,res,next)=>{
         return res.status(401).json({message:"You must be login"})
     };
     next()
+};
+const isadmin= async(req,res,next)=>{
+    try{
+     const Student = await student.findById(req.session.userId)
+     const role= Student.role;
+ 
+     if(role!=="admin"){
+        return res.status(403).json({message:"You must be an admin to access this route"})
+        }
+        
+    
+
+    }
+   
+     catch(err){
+        res.status(500).json({message:'Failed to check role due to',err})
+
+     }
+    next()
 }
 
 
@@ -86,12 +105,13 @@ router.delete('/:student',islogedIn,async(req,res)=>{
 })
 router.post('/register',async(req,res)=>{
     try{
-        const{username,email,password}= req.body;// takes username,email and password from the user
+        const{username,email,password,role}= req.body;// takes username,email and password from the user
         const hashedPassword= await bcrypt.hash(password,10);// hashes the password using bcrypt with a salt rounds of 10
         const newStudent= new student({
             username:username,
             email:email,
-            password:hashedPassword
+            password:hashedPassword,
+            role:role
 
         })// stores the new student data in a new instance of the student model with hashed password
         const savedStudent= await newStudent.save();// saves the new student to the database
@@ -150,7 +170,9 @@ router.post('/logout',(req,res)=>{
 res.status(200).json({message:'Logout successful'})
  
 })
-    
+router.get('/admin',isadmin,(req,res)=>{
+    res.json({message:"you are in the admin pannel"})
+})
         
 
 
