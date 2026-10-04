@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const student= require('../models/student');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 // middleware to log requests 
 const logreq = (req, res, next) => {
