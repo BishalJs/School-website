@@ -3,6 +3,7 @@ const express = require('express');
 const router= express.Router();
 const teacher = require('../models/teacher');
 const app= express();
+const session = require('express-session');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -27,11 +28,20 @@ passport.use(new LocalStrategy((async (username, password, done) => {
     }
 
 })));
+passport.initialize();
+const islogin= (req,res,next)=>{
+    if(!req.session.userId){
+        return res.status(401).json({message:"You must be login"})
+    };
+    next()
+}
 router.post('/teacher/register',async(req,res)=>{
     try{
         // get the data from the request body
         const {username,password,email} = req.body;
         const hashedPassword= await bcrypt.hash(password,10);
+        const newTeacher= new teacher({username:username,password:hashedPassword,email:email});
+        const savedTeacher= await newTeacher.save();
         res.status(200).json({message:'Teacher registered successfully',"username":username,"email":email});
     }
     catch(err){
@@ -39,10 +49,13 @@ router.post('/teacher/register',async(req,res)=>{
     console.log(err);
 }
 });
-router.post('/teacher/login',passport.authenticate('local'),async(req,res)=>{
+router.post('/teacher/login',async(req,res)=>{
     try{
         const {username,password}= req.body;
-        const Teacher= await teacher.findOne({username:username});
+        const Teacher= await teacher.findOne({username});
+        if(!Teacher){
+            return res.status(404).json({message:'Teacher not found'});
+        }
         const passwordMatch= await bcrypt.compare(password,Teacher.password);
         if(!passwordMatch){
             return res.status(401).json({message:'Invalid password'});
@@ -56,11 +69,11 @@ router.post('/teacher/login',passport.authenticate('local'),async(req,res)=>{
 })
 
 
-router.get('/teacher',async(req,res)=>{
+router.get('/teacher',islogin,async(req,res)=>{
     try{
    const Teacher= await teacher.find();
    console.log(Teacher);
-   res.status(200).json(Teacher);
+   res.status(200).json({Teacher});
 }
 
    catch(err){
