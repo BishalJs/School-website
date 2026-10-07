@@ -2,6 +2,7 @@ const express= require('express');
 const db= require('./db')
 const router = express.Router();
 const app= express();
+const cors= require('cors');    
 const session= require('express-session');
 const studentrouter= require('./routes/studentroute');
 const teacherroute= require('./routes/teacherroute');
@@ -12,6 +13,7 @@ const auth= require('./auth');
 const bcrypt = require("bcrypt");
 const passport= require('passport');
 app.use(express.json());
+app.use(cors())
 app.use(
     session({
         secret: 'my-secret-key',
